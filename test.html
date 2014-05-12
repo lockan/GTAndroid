@@ -1,0 +1,314 @@
+ <!-- <!doctype html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>test</title>
+
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css">
+   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+   <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+   <script src="gt_setup_dynamic.js"></script>
+</head>
+<body>
+   <div class="setup"></div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+   <link rel="stylesheet" href="jqm142/jquery.mobile-1.4.2.min.css">
+   <link rel="stylesheet" type="text/css" href="css/gradetracker.css"/>
+   <!-- Custom theme  -->
+   <link rel="stylesheet" href="themes/GradeTracker.min.css" />
+   <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+   <!-- End custom theme -->
+   <script src="jquery/jquery-2.1.1.min.js"></script>
+   <script src="jqm142/jquery.mobile-1.4.2.min.js"></script>
+   <!-- <script src="js/gt_ui_scripts.js"></script>-->
+   <script src="js/gt_setup_dynamic.js"></script>
+
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+
+<body class="ui_mobile_viewport">
+
+   <!-- MAIN LANDING PAGE -->
+   <div data-role="page" id="home">
+
+      <div data-role="header" data-position="fixed" data-id="nav">
+         <div data-role="navbar" role="navigation">
+            <ul>
+               <li><a href="#home" class="ui-btn-active">Home</a></li>
+               <li><a href="#add" data-transition="slide">Add</a></li>
+               <li><a href="#setup" data-transition="slide">Setup</a></li>
+            </ul>
+         </div>
+         <h1>Home</h1>
+      </div>      
+
+      
+      <div role="main" class="ui-content ">
+         
+         <div class="content">
+            
+            <!-- MARK DISPLAY PANEL -->   
+            
+            <div id="main_markpanel">
+               <h3 class="ui-bar ui-bar-b ui-corner-all pagetitle">Overall GPA</h3>
+               <div id="main_mark_overall">50%</div>
+               <div id="main_mark_low">Low: 0%</div>
+               <div id="main_mark_high">High: 100%</div>
+            </div>
+            <!-- END MARK DISPLAY PANEL -->
+
+            <p/>
+
+            <!-- COURSE LIST PANEL -->
+            
+            <div id="listpanel">
+               <p/>
+               <ul data-role="listview">
+                  <li data-role="list-divider"><center>Current Courses</center></li>
+                  <li><a href="#courseview" data-transition="slide">COMP0000 <span class="ui-li-aside">97%</span></a></li>
+                  <li><a href="">COMP0001 <span class="ui-li-aside"> 56%</span></a></li>
+                  <li><a href="">COMP0010</a></li>
+                  <li><a href="">COMP0011</a></li>
+                  <li><a href="">COMP0100</a></li>
+                  <li><a href="">COMP0101</a></li>
+               </ul>
+            </div>
+            <!-- END COURSE LIST PANEL -->
+         
+         </div>   
+
+      </div>
+      
+
+
+
+      <div data-role="footer" data-position="fixed">
+            <h1>GradeTracker</h1>
+      </div>
+
+   </div>
+
+   
+   <!-- END MAIN LANDING PAGE -->
+
+   <!-- ADD MARK PAGE -->
+
+   <div data-role="page" id="add">
+
+   
+      <div data-role="header" data-position="fixed" data-id="nav">
+         
+         <div data-role="navbar" role="navigation">
+            <ul>
+               <li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
+               <li><a href="#add" class="ui-btn-active">Add</a></li>
+               <li><a href="#setup" data-transition="slide">Setup</a></li>
+            </ul>
+         </div>
+         
+         <h1>Add Mark</h1>
+      </div>
+
+      <div role="main" class="ui-content">
+         <form action="" method="post">
+               <select name="select-course" id="select-course">
+                  <option>Select a course</option>
+                  <option value="COMP2714">COMP2714</option>
+                  <option value="COMP2121">COMP2121</option>
+                  <option value="COMP2721">COMP2721</option>
+                  <option value="COMM2216">COMM2216</option>
+               </select>
+               <select name="select-category" id="select-category">
+                  <option>Select a category</option>
+                  <option value="Quiz">Quiz</option>
+                  <option value="Assignment">Assignment</option>
+                  <option value="Lab">Lab</option>
+                  <option value="Midterm">Midterm</option>
+               </select>
+               <div data-role="fieldcontain">
+                  <label for="mark">Mark:</label>
+                  <input type="number" min="0" step="0.5" value="0" name="mark" id="mark">
+                  <label for"mark_total">Out of:</label>
+                  <input type="number" min="0" step="1" value="0" name="mark_total" id="mark_total">
+               </div>
+               <label for="note">Note:</label>
+               <input type="text" id="note" name="note" value=""/>
+               <button type="submit" name="Add" id="add">Add Mark</button>
+         </form>
+      </div>
+
+      <div data-role="footer" data-position="fixed">
+         <h1>GradeTracker</h1>
+      </div>
+   
+   </div>
+   <!-- END ADD MARK PAGE -->
+
+   <!-- COURSE SETUP PAGE -->
+
+   <div data-role="page" id="setup">
+      <div data-role="header" data-position="fixed" data-id="nav">
+         
+         <div data-role="navbar" role="navigation">
+            <ul>
+               <li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
+               <li><a href="#add" data-transition="slide" data-direction="reverse">Add</a></li>
+               <li ><a href="#setup" class="ui-btn-active">Setup</a></li>
+            </ul>
+         </div>
+         
+         <h1>Course Setup</h1>
+      </div>
+
+      <div role="main" class="ui-content">
+         <form action="" method="post">
+            <div class="setup">
+            </div>
+         </form>
+
+         <a href="#setupweight" data-role="button" data-icon="edit" data-transition="slide">Edit</a>
+      </div>
+
+      <div data-role="footer" data-position="fixed">
+         <h1>GradeTracker</h1>
+      </div>
+
+
+
+   </div>
+   <!-- END COURSE SETUP PAGE -->
+
+      <!-- COURSE WEIGHT SETUP PAGE -->
+
+   <div data-role="page" id="setupweight">
+
+
+      <div data-role="header" data-position="fixed" data-id="nav">
+         
+         <div data-role="navbar" role="navigation">
+            <ul>
+               <li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
+               <li><a href="#add" data-transition="slide" data-direction="reverse">Add</a></li>
+               <li ><a href="#setup" class="ui-btn-active">Setup</a></li>
+            </ul>
+         </div>
+         
+         <h1>Course Weight Setup</h1>
+      </div>
+
+      <div role="main" class="ui-content">
+         <form action="" method="post">
+            <div class="setupweight">
+               <fieldset data-role="controlgroup">
+                   <legend>Adjust course weight:</legend>
+                                                             
+                  </fieldset>
+            </div>
+         </form>
+      </div>
+
+      <div data-role="footer" data-position="fixed">
+         <h1>GradeTracker</h1>
+      </div>
+
+   </div>
+   <!-- END COURSE WEIGHT SETUP PAGE -->
+
+   <!-- COURSE SETUP PAGE -->
+
+   <div data-role="page" id="courseview">
+
+
+      <div data-role="header" data-position="fixed" data-id="nav">
+         
+         <div data-role="navbar" role="navigation">
+            <ul>
+               <li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
+               <li><a href="#add" data-transition="slide">Add</a></li>
+               <li ><a href="#setup" data-transition="slide">Setup</a></li>
+            </ul>
+         </div>
+         
+         <h1>Course View</h1>
+      </div>
+
+      <div role="main" class="ui-content">
+         
+         <div class="content">
+            <!-- MARK DISPLAY PANEL -->   
+            <div id="course_markpanel">
+               <h3 class="ui-bar ui-bar-b ui-corner-all pagetitle">COMP0000</h3>
+               <div id="main_mark_overall">50%</div>
+               <div id="main_mark_low">Low: 0%</div>
+               <div id="main_mark_high">High: 100%</div>
+            </div>
+            <!-- END MARK DISPLAY PANEL -->
+
+            <p/>
+
+            <!-- START MARKS COLLAPSIBLE SET -->
+
+            <div id="markspanel">
+               
+               <div data-role="collapsibleset">
+                   
+                   <div data-role="collapsible">
+                       <h3>Assignments - 65%</h3>
+                     
+                     <div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
+                        <a class="ui-btn markbutton" href="">Assignment 1 - 55%</a>
+                        <a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
+                        <a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
+                     </div>
+
+                     <div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
+                        <a class="ui-btn markbutton" href="">Assignment 2 - 73%</a>
+                        <a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
+                        <a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
+                     </div>
+
+                   </div>
+                   
+                   <div data-role="collapsible">
+                       <h3>Quizzes - 33%</h3>
+                     
+                     <div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
+                        <a class="ui-btn markbutton" href="">Quiz 1 - 55%</a>
+                        <a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
+                        <a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
+                     </div>
+
+                     <div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
+                        <a class="ui-btn markbutton" href="">Quiz 2 - 15%</a>
+                        <a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
+                        <a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
+                     </div>
+
+                   </div>
+               </div>
+            </div>
+
+            <!-- END MARKS COLLAPSIBLE SET -->
+
+         </div>
+      </div>
+
+      <div data-role="footer" data-position="fixed">
+         <h1>GradeTracker</h1>
+      </div>
+
+   </div>
+   <!-- END COURSE SETUP PAGE -->
+</body>
+
+</html>

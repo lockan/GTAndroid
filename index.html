@@ -9,60 +9,163 @@
 	<link rel="stylesheet" href="jqm142/jquery.mobile-1.4.2.min.css">
 	<link rel="stylesheet" type="text/css" href="css/gradetracker.css"/>
 	<!-- Custom theme  -->
+<!--
+	<link rel="stylesheet" href="themes/gt_newtheme.min.css" />
+-->
+<!--
+	<link rel="stylesheet" href="themes/redg.min.css" />
+-->
 	<link rel="stylesheet" href="themes/GradeTracker.min.css" />
+
 	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+
 	<!-- End custom theme -->
 	<script src="jquery/jquery-2.1.1.min.js"></script>
-	<script src="jqm142/jquery.mobile-1.4.2.min.js"></script>
+	<!-- DYNAMIC GENERATION OF COURSE LISTS - MUST COME AFTER LOADING JQUERY AND BEFORE JQUERY MOBILE -->
 	<script type="text/javascript" src="js/CourseGrades.js"></script>
-   <script type="text/javascript" src="js/CourseData.js"></script>
-   <script type="text/javascript" src="js/dummy.js"></script>
+	<script type="text/javascript" src="js/coursedata.js"></script>
 	<script src="js/gt_setup_dynamic.js"></script>
+	<script src="js/gradetracker.js"></script>
+	<!-- END COURSE LIST GENERATION -->
+	<script src="jqm142/jquery.mobile-1.4.2.min.js"></script>
 	<script src="js/gt_ui_scripts.js"></script>
-	
+
+     <!-- Receive user input from Add Mark page and ssve data in object -->
+    <script>
+    function handleChoice() {
+        var courseData = null;
+        
+        if (myCSTCourses.getCourse($('#select-course').find('option:selected').text()) != null) {
+            var courseData = myCSTCourses.getCourse($('#select-course').find('option:selected').text());
+            //alert("Selected Option: " + $('#select-course').find('option:selected').text() + "\nSelected Category: " + $('#select-category').find('option:selected').text() + "\nMark Achieved: " + $('#mark').val() + " out of " + $('#mark_total').val() + "\nNote: " + $('#note').val());
+            courseData.addMarkInstance($('#select-category').find('option:selected').text(), $('#note').val(), $('#mark').val(), $('#mark_total').val()); 
+            courseData.printData();          
+        }
+
+        $('#select-course').val('').selectmenu('refresh');
+        $('#select-category').val('').selectmenu('refresh');
+        $('#mark').val('').textinput('refresh');
+        $('#mark_total').val('').textinput('refresh');
+        $('#note').val('').textinput('refresh');
+        
+        updateMainPageAverages();
+        drawChart();
+        return false;
+      }
+      </script>
+<!-- This makes the persistent header/footer system work -->
+	<script>
+
+	$(document).ready( function() {
+		console.log("Document Ready. Start page initialization");
+		initNavVars();
+
+		console.log("Setting up toolbars");
+		$( "[data-role='navbar']" ).navbar();
+		$( "[data-role='header'], [data-role='footer']" ).toolbar();
+
+		startNavListener();
+        startAddListener();
+        
+        
+        $("#select-course").bind('change', function() {
+            $('#select-category').empty();
+            $('#select-category').append('<option>Select a category</option>');
+            var courseData = myCSTCourses.getCourse($('#select-course').find('option:selected').text());
+            var markCategories = courseData.getMarkCatagories();
+            
+            for ( var x in markCategories ) {
+                $('#select-category').append('<option value="' + markCategories[x].getCategoryName() + '">' + markCategories[x].getCategoryName() + '</option>');
+            }
+        });
+
+       /*
+            var finalString = "";
+            alert("Showing course data for: " + this.id);
+            var courseData = myCSTCourses.getCourse(this.id);
+            var markCategories = courseData.getMarkCatagories();
+            for ( var i in markCategories ) 
+            {
+                if (markCategories[i].getAllMarkInstances().length < 1) 
+                {
+                    continue;
+                }
+                var markInstances = markCategories[i].getAllMarkInstances();
+                finalString += '<div data-role="collapsible">'; 
+                finalString += '<h3>' + markCategories[i].getCategoryName() + ' - ' + markCategories[i].averageOverall() + '%</h3>';
+                for (var x in markInstances) 
+                {
+                    finalString += '<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">';
+                    finalString += '<a class="ui-btn markbutton" href="">' + markInstances[x].getName() + ' - ' + markInstances[x].getPercentage() + '%</a>';
+                    finalString += '<a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>';
+                    finalString += '<a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>';
+                    finalString += '</div>' 
+                }
+                finalString += '</div>';      
+            }
+            
+            $('#mark-data').empty();
+            $('#mark-data').append(finalString);
+            $('#mark-data').trigger('create');
+            */
+    });
+
+	</script>
+<!-- End persistent header code -->
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+	
 </head>
 
 <body class="ui_mobile_viewport">
 
+<!-- BEGIN PERSISTENT NAV HEADER -->
+	<div data-role="header" data-position="fixed">
+		<div data-role="navbar" role="navigation" data-iconpos="bottom">
+			<ul>
+				<li><a href="#home" data-icon="home" class="ui-btn ui-btn-b ui-btn-active" data-transition="slide" id="navhome">Home</a></li>
+				<li><a href="#add" data-icon="plus" class="ui-btn ui-btn-b" data-transition="slide" id="navadd">Add</a></li>
+				<li><a href="#setup" data-icon="gear" class="ui-btn ui-btn-b" data-transition="slide" id="navsetup">Setup</a></li>
+			</ul>
+		</div>
+		<div role="header" class="ui-bar ui-bar-b ui-mini">
+			<h1 class="ui-title" id="nav_heading">Home</h1>
+		</div>
+	</div>
+<!-- END PERSISTENT HEADER -->	
+
 	<!-- MAIN LANDING PAGE -->
 	<div data-role="page" id="home">
 
-		<div data-role="header" data-position="fixed" data-id="nav">
-			<div data-role="navbar" role="navigation">
-				<ul>
-					<li><a href="#home" class="ui-btn-active">Home</a></li>
-					<li><a href="#add" data-transition="slide">Add</a></li>
-					<li><a href="#setup" data-transition="slide">Setup</a></li>
-				</ul>
-			</div>
-			<h1>Home</h1>
-		</div>		
-
-		
 		<div role="main" class="ui-content ">
 			
 			<div class="content">
 				
 				<!-- MARK DISPLAY PANEL -->	
-				
 				<div id="main_markpanel">
-					<h3 class="ui-bar ui-bar-b ui-corner-all pagetitle">Overall GPA</h3>
-					<div class="main_mark_overall">50%</div>
-					<div class="main_mark_low">Low: 0%</div>
-					<div class="main_mark_high">High: 100%</div>
+
+					<div class="pagetitle" data-role="header" data-theme="a">
+					<a href="#" data-icon="arrow-l" data-iconpos="notext" onclick="navLeft()" id="main_mark_navleft"></a>
+					<h1>Overall GPA</h1>
+					<a href="#" data-icon="arrow-r" data-iconpos="notext" onclick="navRight()" id="main_mark_navright"></a>
+					</div>
+
+					<div id="chart_markpanel"></div>
+					<div id="main_mark_averages">
+						<div class="main_mark_overall"></div>
+						<div class="main_mark_low"></div>
+						<div class="main_mark_high"></div>
+					</div>
 				</div>
 				<!-- END MARK DISPLAY PANEL -->
 
-				<p></p>
+				<p><br /></p>
 
 				<!-- COURSE LIST PANEL -->
 				
 				<div id="listpanel">
 					<p></p>
-					<ul data-role="listview">
+					<!-- <ul data-role="listview" id="main-page-courselist">
 						<li data-role="list-divider"><center>Current Courses</center></li>
 						<li><a href="#courseview" data-transition="slide">COMP0000 <span class="ui-li-aside">97%</span></a></li>
 						<li><a href="">COMP0001 <span class="ui-li-aside"> 56%</span></a></li>
@@ -70,7 +173,7 @@
 						<li><a href="">COMP0011</a></li>
 						<li><a href="">COMP0100</a></li>
 						<li><a href="">COMP0101</a></li>
-					</ul>
+					</ul> -->
 				</div>
 				<!-- END COURSE LIST PANEL -->
 			
@@ -78,13 +181,6 @@
 
 		</div>
 		
-
-
-
-		<div data-role="footer" data-position="fixed">
-				<h1>GradeTracker</h1>
-		</div>
-
 	</div>
 
 	
@@ -94,51 +190,44 @@
 
 	<div data-role="page" id="add">
 
-	
-		<div data-role="header" data-position="fixed" data-id="nav">
-			
-			<div data-role="navbar" role="navigation">
-				<ul>
-					<li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
-					<li><a href="#add" class="ui-btn-active">Add</a></li>
-					<li><a href="#setup" data-transition="slide">Setup</a></li>
-				</ul>
-			</div>
-			
-			<h1>Add Mark</h1>
-		</div>
-
 		<div role="main" class="ui-content">
-			<form action="#" method="post">
+			<form name="addmark" onsubmit="return handleChoice()">
 				   <select name="select-course" id="select-course">
-				   	<option>Select a course</option>
+				   	<!-- <option>Select a course</option>
 				      <option value="COMP2714">COMP2714</option>
 				      <option value="COMP2121">COMP2121</option>
 				      <option value="COMP2721">COMP2721</option>
-				      <option value="COMM2216">COMM2216</option>
-	   			</select>
+				      <option value="COMM2216">COMM2216</option> -->
+	   			</select> 
 	   			<select name="select-category" id="select-category">
-	   				<option>Select a category</option>
+	   				<!-- <option>Select a category</option>
 				      <option value="Quiz">Quiz</option>
 				      <option value="Assignment">Assignment</option>
 				      <option value="Lab">Lab</option>
-				      <option value="Midterm">Midterm</option>
+				      <option value="Midterm">Midterm</option> -->
 	   			</select>
 	   			<div data-role="fieldcontain">
-		   			<label for="mark">Mark:</label>
+		   			<label for="mark"><span class="sublabel">Mark:</span></label>
 		   			<input type="number" min="0" step="0.5" value="0" name="mark" id="mark">
-		   			<label for="mark_total">Out of:</label>
+		   			<label for="mark_total"><span class="sublabel">Out of:</span></label>
 		   			<input type="number" min="0" step="1" value="0" name="mark_total" id="mark_total">
 		   		</div>
-		   		<label for="note">Note:</label>
+		   		<label for="note"><span class="sublabel">Note:</span></label>
 		   		<input type="text" id="note" name="note" value=""/>
-		   		<button type="submit" name="Add" id="add_mark">Add Mark</button>
+		   		<button type="submit" name="Add" id="add_mark" onclick="showAddPopUp()">Add Mark</button>
 			</form>
 		</div>
 
-		<div data-role="footer" data-position="fixed">
-			<h1>GradeTracker</h1>
+		<!-- Add mark popup on success -->
+		<div data-role="popup" id="popupAdd">
+		  <!-- <p>Mark [markname] added to course [course]</p> -->
 		</div>
+		<!-- Add mark popup on failure -->
+        <!-- NEEDS TO BE CALLED WHEN ADDING FAILS
+		<div data-role="popup" id="popupAdd">
+		  <p>Add mark failed.</p>
+		</div>
+        -->
 	
 	</div>
 	<!-- END ADD MARK PAGE -->
@@ -147,151 +236,50 @@
 
 	<div data-role="page" id="setup">
 
-		<script>
-			$(document).ready( function() { 
-				populateCourseSetup() 
-			} );
-		</script>
-
-		<div data-role="header" data-position="fixed" data-id="nav">
-			
-			<div data-role="navbar" role="navigation">
-				<ul>
-					<li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
-					<li><a href="#add" data-transition="slide" data-direction="reverse">Add</a></li>
-					<li ><a href="#setup" class="ui-btn-active">Setup</a></li>
-				</ul>
-			</div>
-			
-			<h1>Course Setup</h1>
-		</div>
-
 		<div role="main" class="ui-content">
+
 			<form action="#" method="post">
 				<div class="setup">
 				  	<!-- Courses get dynamically inserted here -->
 				</div>
 			</form>
 
+
 			<a href="#setupweight" data-role="button" data-icon="edit" data-transition="slide">Edit</a>
 		</div>
-
-		<div data-role="footer" data-position="fixed">
-			<h1>GradeTracker</h1>
-		</div>
-
-
 
 	</div>
 	<!-- END COURSE SETUP PAGE -->
 
-		<!-- COURSE WEIGHT SETUP PAGE -->
-
-	<div data-role="page" id="setupweight">
-
-
-		<div data-role="header" data-position="fixed" data-id="nav">
-			
-			<div data-role="navbar" role="navigation">
-				<ul>
-					<li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
-					<li><a href="#add" data-transition="slide" data-direction="reverse">Add</a></li>
-					<li ><a href="#setup" class="ui-btn-active">Setup</a></li>
-				</ul>
-			</div>
-			
-			<h1>Course Weight Setup</h1>
-		</div>
-
-		<div role="main" class="ui-content">
-			<form action="#" method="post">
-				<div class="setupweight">
-				  	<fieldset data-role="controlgroup">
-					    <legend>Adjust course weight:</legend>
-					    						    						    
-				   	</fieldset>
-				</div>
-			</form>
-		</div>
-
-		<div data-role="footer" data-position="fixed">
-			<h1>GradeTracker</h1>
-		</div>
-
-	</div>
-	<!-- END COURSE WEIGHT SETUP PAGE -->
-
-	<!-- COURSE SETUP PAGE -->
+	<!-- COURSE VIEW PAGE -->
 
 	<div data-role="page" id="courseview">
-
-
-		<div data-role="header" data-position="fixed" data-id="nav">
-			
-			<div data-role="navbar" role="navigation">
-				<ul>
-					<li><a href="#home" data-transition="slide" data-direction="reverse">Home</a></li>
-					<li><a href="#add" data-transition="slide">Add</a></li>
-					<li ><a href="#setup" data-transition="slide">Setup</a></li>
-				</ul>
-			</div>
-			
-			<h1>Course View</h1>
-		</div>
 
 		<div role="main" class="ui-content">
 			
 			<div class="content">
 				<!-- MARK DISPLAY PANEL -->	
 				<div id="course_markpanel">
-					<h3 class="ui-bar ui-bar-b ui-corner-all pagetitle">COMP0000</h3>
-					<div class="main_mark_overall">50%</div>
-					<div class="main_mark_low">Low: 0%</div>
-					<div class="main_mark_high">High: 100%</div>
+
+					<div class="pagetitle" data-role="header" data-theme="a">
+					<a href="#" data-icon="arrow-l" data-iconpos="notext"></a>
+					<h1 id = "course_name">COMP 1234</h1>
+					<a href="#" data-icon="arrow-r" data-iconpos="notext"></a>
+					</div>
+
+					<div class="main_mark_overall"><span id = "course_mark_overall_number"></span>%</div>
+					<div class="main_mark_low">Low: <span id = "course_mark_low_number"></span></div>
+					<div class="main_mark_high">High: <span id = "course_mark_high_number"></span></div>
 				</div>
 				<!-- END MARK DISPLAY PANEL -->
 
-				<p></p>
+				<p><br /></p>
 
 				<!-- START MARKS COLLAPSIBLE SET -->
 
 				<div id="markspanel">
-					
-					<div data-role="collapsibleset">
-					    
-					    <div data-role="collapsible">
-					        <h3>Assignments - 65%</h3>
-					    	
-					    	<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
-					    		<a class="ui-btn markbutton" href="">Assignment 1 - 55%</a>
-					    		<a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
-					    		<a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
-					    	</div>
-
-					    	<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
-					    		<a class="ui-btn markbutton" href="">Assignment 2 - 73%</a>
-					    		<a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
-					    		<a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
-					    	</div>
-
-					    </div>
-					    
-					    <div data-role="collapsible">
-					        <h3>Quizzes - 33%</h3>
-					    	
-					    	<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
-					    		<a class="ui-btn markbutton" href="">Quiz 1 - 55%</a>
-					    		<a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
-					    		<a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
-					    	</div>
-
-					    	<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="markentry">
-					    		<a class="ui-btn markbutton" href="">Quiz 2 - 15%</a>
-					    		<a class="ui-btn ui-icon-edit ui-btn-icon-notext markedit" href="">Edit</a>
-					    		<a class="ui-btn ui-icon-delete ui-btn-icon-notext markdelete" href="">Delete</a>
-					    	</div>
-
-					    </div>
+					<div data-role="collapsibleset" id="mark-data">
+                        <!-- AUTO-GENERATED HTML -->
 					</div>
 				</div>
 
@@ -300,12 +288,57 @@
 			</div>
 		</div>
 
-		<div data-role="footer" data-position="fixed">
-			<h1>GradeTracker</h1>
-		</div>
-
 	</div>
-	<!-- END COURSE SETUP PAGE -->
+	<!-- END COURSE VIEW PAGE -->
+
+	<!-- CONFIRM DELETE POPUP -->
+	<div data-role="page" data-dialog="true" data-close-btn="none" id="dialog_del">
+		<div data-role="header"><h1>Delete Mark?</h1></div>
+		<p><span class="sublabel">Are you sure you wish to delete this mark?</span>   
+		<a href="" class="ui-btn ui-icon-check ui-btn-icon-right">Yes</a>
+		<a href="" class="ui-btn ui-icon-delete ui-btn-icon-right">No</a>
+	</div>
+	<!-- END CONFIRM DELETE POPUP -->
+
+	<!-- COURSE WEIGHT SETUP PAGE -->
+
+	<div data-role="page" id="setupweight">
+
+		<p><strong>Course Weight Setup</Strong></p>
+		
+		<div role="main" class="ui-content">
+			<form action="#" method="post">
+				<div class="setupweight">
+				  	<fieldset data-role="controlgroup">
+				  		<!-- I hid this because it was showing up on page transitions. Andrew L. 
+					    <legend>Adjust course weight:</legend>
+						-->
+				   	</fieldset>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- END COURSE WEIGHT SETUP PAGE -->
+
+	
+
+<!-- BEGIN PERSISTENT FOOTER -->
+
+	<div data-role="footer" data-position="fixed" class="ui-bar ui-bar-a ui-mini">
+			<h1>GradeTracker</h1>
+			<a href="#dialog_del" data-transition="pop" class="ui-link">Test Dialog</a>
+	</div>
+
+<!-- END PERSISTENT FOOTER -->
+
+<!-- Include google charts -->
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script src="js/chart.js"></script>
+<script>
+	$(window).resize(drawChart);
+</script>
+
 </body>
 
 </html>

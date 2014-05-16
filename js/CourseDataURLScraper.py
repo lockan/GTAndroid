@@ -122,6 +122,12 @@ def fileparser(url, outputFile, termCode):
     with open(outputFile, "a") as myfile:
         myfile.write(myStr)
 
+## To do: automate the collection of all options
+
+## To do: automate the collection of all  courses for all options
+ ## to do: automate the collection of all outline url for all courses.
+        
+
 ## Big data dump of all CST courses. This is better than by hand but it
 ## still seems like too much work.
     

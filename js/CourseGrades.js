@@ -64,6 +64,11 @@ function MarkCategory(name, inputWeight) {
 
     // Here are some generic getters and setters:
 
+    this.getAllMarkInstances = function ()
+    {
+        return myMarkInstances;
+    }
+
     this.getCategoryName = function () {
         return categoryName;
     };
@@ -309,7 +314,10 @@ function CourseMarks(name, desc, year, semester, credits, optionCode) {
 
         for (i = 0; i < myMarkCategories.length; i++) {
             if (myMarkCategories[i].getNumInstances() > 0) { // If the category is not empty
+                //console.log("Weight sum is " + weightSum);
                 weightSum += myMarkCategories[i].getWeight();
+               // console.log("Weight sum is now " + weightSum);
+
             }
         } 
 
@@ -326,7 +334,9 @@ function CourseMarks(name, desc, year, semester, credits, optionCode) {
             sum = -1;
         }
 
-        return sum; 
+        //console.log("Your average for " + this.getName() + " is " + sum);
+
+        return roundGrade(sum); 
     };
 
    /* Calculates the highest possible mark the user could get.
@@ -334,11 +344,11 @@ function CourseMarks(name, desc, year, semester, credits, optionCode) {
     */
     this.tallyHighest = function () {
         var sum = 0;
-
+        //console.log("tally highest");
         for (i = 0; i < myMarkCategories.length; i++) {
             myMarkCategory = myMarkCategories[i];
             if (myMarkCategory.getNumInstances() > 0) { // If the category is not empty
-                sum += myMarkCategory.averageOverall() * myMarkCategory.getWeight();
+                sum += myMarkCategory.averageOverall() * myMarkCategory.getWeight() / 100;
             } else {
                 sum += myMarkCategory.getWeight();
             }
@@ -348,7 +358,9 @@ function CourseMarks(name, desc, year, semester, credits, optionCode) {
             sum = 100;
         } 
 
-        return sum;
+        //console.log("The sum is " + sum);
+
+        return roundGrade(sum);
     };
 
     /* Calculates the lowest possible mark the user could get.
@@ -360,11 +372,11 @@ function CourseMarks(name, desc, year, semester, credits, optionCode) {
         for (i = 0; i < myMarkCategories.length; i++) {
             myMarkCategory = myMarkCategories[i];
             if (myMarkCategory.getNumInstances() > 0) { // If the category is not empty
-                sum += myMarkCategory.averageOverall() * myMarkCategory.getWeight();
+                sum += myMarkCategory.averageOverall() * myMarkCategory.getWeight() / 100;
             } 
         } 
 
-        return sum;
+        return roundGrade(sum);
     };
 
     // Generic getter
@@ -404,12 +416,16 @@ function CourseMarksSet () {
 
     /* Gives back a reference to a course with the name [foo], if i have it.
      */
-    function getCourse (courseName) {
+    this.getCourse = function (courseName) {
         var output = null;
         var i = 0;
 
+       // console.log("get course");
+        if (myCourseMarks.length == 0) return null;
+
         while (myCourseMarks[i].getName() != courseName && 
-               i < myCourseMarks.length) {
+               i < myCourseMarks.length-1) {
+            //console.log(i);
             i++;
         }
 
@@ -440,28 +456,103 @@ function CourseMarksSet () {
         myOldGPA[GPA] = oldGPA;
     };
 
-    /* Calculates the GPA for all courses that the user has currently 
+
+        /* Calculates the GPA for all courses that the user has currently 
      * selected.
      */
     this.calculateTermGPA = function () {
-        console.log("CTGPA");
+       // console.log("CTGPA");
         var totalCredits = 0;
         var totalMarks = 0;
-        var TermGPA = null;
+        var termGPA = -1;
+        //console.log("My course marks is " + myCourseMarks.length + "long");
+        var myCourseArray = this.getSelectedCourseMarks();
 
-        for (i = 0; i < myCourseMarks.length; i++) {
-            if (myCourseMarks[i].getIncludeInGPA()) {
-                totalCredits += myCourseMarks[i].getNumCredits();
-                totalMarks += myCourseMarks[i].tallyMarks() *
-                              myCourseMarks[i].getNumCredits();
+        //console.log("My course array is " + myCourseArray.length + " long");
+
+        for (x = 0; x < myCourseArray.length; x++) {
+            //console.log(myCourseArray[x].getName());
+            //console.log("TOtal credits is " + totalCredits);
+            var localTally = myCourseArray[x].tallyMarks();
+            if (localTally >= 0) {
+                totalMarks += localTally * myCourseArray[x].getNumCredits();
+             //   console.log("Total marks is " + totalMarks);
+                totalCredits += myCourseArray[x].getNumCredits();
             }
         }
 
         if (totalCredits > 0) {
-            TermGPA = totalMarks / totalCredits;
-        } 
+            //console.log("Hello");
+            termGPA = totalMarks / totalCredits;
+        }
 
-        return TermGPA;
+        //console.log("Your term GPA is " + termGPA);
+        return roundGrade(termGPA);
+    };
+
+    this.calculateHighTermGPA = function () {
+       //console.log("CHTGPA");
+        var totalCredits = 0;
+        var totalMarks = 0;
+        var highTermGPA = -1;
+        //console.log("My course marks is " + myCourseMarks.length + "long");
+        var myCourseArray = this.getSelectedCourseMarks();
+
+//console.log(myCourseArray.length);
+
+        for (m = 0; m < myCourseArray.length; m++) {
+           // console.log(myCourseArray[m].getName());
+           // console.log("Highest possible is " + myCourseArray[m].tallyHighest());
+           // myCourseArray[m].printData();
+            var localTally = myCourseArray[m].tallyHighest();
+            if (localTally >= 0) {
+             //   console.log("Num credits is " + myCourseArray[m].getNumCredits());
+                totalMarks += localTally * myCourseArray[m].getNumCredits();
+             //   console.log("Total marks is now " + totalMarks);
+                totalCredits += myCourseArray[m].getNumCredits();
+            }
+
+        }
+
+      // console.log("Total credits: " + totalCredits);
+      // console.log("Total marks: " + totalMarks);
+
+        if (totalCredits > 0) {
+          //  console.log("Hello");
+            highTermGPA = totalMarks / totalCredits;
+        }
+
+     //   console.log("Your highest term GPA is " + highTermGPA);
+        return roundGrade(highTermGPA);
+    };
+
+    this.calculateLowTermGPA = function () {
+       // console.log("CLTGPA");
+        var totalCredits = 0;
+        var totalMarks = 0;
+        var lowTermGPA = -1;
+        //console.log("My course marks is " + myCourseMarks.length + "long");
+        var myCourseArray = this.getSelectedCourseMarks();
+
+//console.log(myCourseArray.length);
+
+        for (m = 0; m < myCourseArray.length; m++) {
+     //       console.log(myCourseArray[m].getName());
+      //      console.log("Lowesrt possible is " + myCourseArray[m].tallyLowest());
+            totalCredits += myCourseArray[m].getNumCredits();
+            var localTally = myCourseArray[m].tallyLowest();
+            if (localTally >= 0) {
+                totalMarks += localTally * myCourseArray[m].getNumCredits();
+                totalCredits += myCourseArray[m].getNumCredits();
+            }
+        }
+
+        if (totalCredits > 0) {
+            lowTermGPA = totalMarks / totalCredits;
+        }
+
+//        console.log("Your lowest term GPA is " + lowTermGPA);
+        return roundGrade(lowTermGPA);
     };
 
     this.calculateTermCredits = function () {
@@ -496,8 +587,8 @@ function CourseMarksSet () {
             CGPA = myOldGPA * oldGPAWeight + newGPA * newGPAWeight;
         }
 
-        return CGPA;
-    };
+        return roundGrade(CGPA);
+    };    
 
     /* Returns the entire array of CourseMarks.
      */
@@ -536,67 +627,6 @@ function CourseMarksSet () {
 }
 
 
-/*
-
-
-
-// Here's a driver program to show the basics of this class structure.
-
-// Start a new CourseMarks for COMP 1113, 2014, semester 1, 17 credits.
-var myMathGrades = new CourseMarks("COMP 1113", 2014, 1, 17);
-
-
-
-
-// Add a category Quizzes, worth 20 percent of the final grade
-myMathGrades.addMarkCategory("Quizzes", 20);
-// Add a category Assignments, worth 10 percent of the final grade
-myMathGrades.addMarkCategory("Assignments", 10);
-// ... And so on
-myMathGrades.addMarkCategory("Midterm", 30);
-myMathGrades.addMarkCategory("Final", 40);
-
-// Display the marks distribution for the course on console.
-myMathGrades.printData(); 
-
-// Got 1 out of 5 on quiz 1
-myMathGrades.addMarkInstance("Quizzes", "Quiz 1", 1, 5);
-
-myMathGrades.printData(); 
-
-
-// Let's see if this is successful: it shouldnt be as there is already a Quiz 1
-
-if (myMathGrades.addMarkInstance("Quizzes", "Quiz 1", 400, 2)) {
-    alert("If you see this, something is wrong");
-};
-
-myMathGrades.printData(); 
-
-// Successfully grubbed a better grade on Quiz 1.
-
-myMathGrades.getMarkInstance("Quizzes", "Quiz 1").setActualMark(3);
-
-myMathGrades.printData(); 
-
-// Got 5 out of 5 on quiz 2
-myMathGrades.addMarkInstance("Quizzes", "Quiz 2", 5, 5); 
-// And so on
-myMathGrades.addMarkInstance("Quizzes", "Quiz 3", 4.5, 5); 
-myMathGrades.addMarkInstance("Quizzes", "Quiz 4", 4.5, 5); 
-myMathGrades.addMarkInstance("Quizzes", "Quiz 5", 4.5, 5); 
-myMathGrades.addMarkInstance("Quizzes", "Quiz 6", 4.5, 5); 
-myMathGrades.addMarkInstance("Quizzes", "Quiz 7", 4.5, 5); 
-myMathGrades.addMarkInstance("Quizzes", "Quiz 8", 4.5, 5); 
-
-// Add an assignment grade
-myMathGrades.addMarkInstance("Assignments", "Assignment 1", 67, 75);
-// And a midterm
-myMathGrades.addMarkInstance("Midterm", "Midterm", 35, 40);
-
-myMathGrades.printData(); 
-
-// Finally, tally up all the marks.
-console.log("Your average so far is " + myMathGrades.tallyMarks() + "%."); 
-
-*/
+function roundGrade(grade) {
+    return Math.round(grade * 100) / 100;
+}
